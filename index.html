@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#061b2b">
+<title>Морской бой — онлайн</title>
+<style>
+:root{--bg:#061b2b;--panel:#0c2a40;--panel2:#103650;--line:#28516a;--text:#eaf6ff;--muted:#9ab6c8;--cyan:#38c6dc;--gold:#f0b84b;--red:#ff6666;--green:#62d5a1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#174867 0,#061b2b 50%,#04131f 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+button,input{font:inherit}button{border:0;border-radius:12px;padding:12px 16px;background:linear-gradient(135deg,#20a9c5,#167b9c);color:white;font-weight:750;cursor:pointer;box-shadow:0 5px 18px #00131f66}button:disabled{opacity:.4;cursor:not-allowed}button.secondary{background:#173d55;border:1px solid #32627c;box-shadow:none}button.ghost{background:transparent;border:1px solid var(--line);box-shadow:none}
+input{width:100%;background:#061c2b;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:12px;outline:none}input:focus{border-color:var(--cyan)}
+.wrap{width:min(1100px,100%);margin:auto;padding:18px 14px 36px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:11px}.mark{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#2ac5db,#155b83);font-size:23px;box-shadow:0 6px 22px #00b7d733}.brand h1{font-size:19px;line-height:1.1;margin:0;letter-spacing:.04em}.brand small{color:var(--muted);font-size:11px;letter-spacing:.18em}
+.status{font-size:12px;color:var(--green);border:1px solid #2d806a;padding:7px 10px;border-radius:99px;white-space:nowrap}
+.panel{background:linear-gradient(160deg,#0d2d43ee,#092337f5);border:1px solid #28516a;border-radius:18px;padding:16px;box-shadow:0 12px 35px #0004}.hero{max-width:560px;margin:7vh auto 0}.hero h2{font-size:27px;margin:0 0 7px}.sub{color:var(--muted);line-height:1.5;margin:0 0 20px}.field{display:grid;gap:7px;margin:13px 0}.field label,.mini-label{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.hint{color:var(--muted);font-size:12px;line-height:1.5;margin-top:13px}
+.hidden{display:none!important}.room-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}.room-code{font-weight:850;letter-spacing:.14em;color:var(--gold);font-size:17px}.room-link{display:flex;gap:8px;align-items:center;min-width:min(100%,420px)}.room-link input{font-size:12px}.room-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,.72fr);gap:14px}.game-area{min-width:0}.side{display:grid;align-content:start;gap:14px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 12px;font-size:15px}.muted{color:var(--muted);font-size:12px}.players{display:flex;gap:8px;flex-wrap:wrap}.player-pill{background:#092237;border:1px solid var(--line);border-radius:99px;padding:7px 10px;font-size:12px}.player-pill.active{border-color:var(--gold);color:var(--gold)}
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:14px}.board-card{min-width:0}.board-title{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-bottom:8px;font-size:13px;font-weight:800}.board{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;padding:5px;background:#061a28;border:1px solid #28516a;border-radius:10px;aspect-ratio:1}
+.cell{position:relative;min-width:0;aspect-ratio:1;border:1px solid #1d4962;border-radius:2px;background:linear-gradient(145deg,#164c69,#0d3550);padding:0;box-shadow:none;cursor:default}
+.cell.ship{background:linear-gradient(145deg,#8499a5,#455f70);border-color:#a8c1ce}.cell.miss:after{content:"";position:absolute;width:22%;height:22%;border-radius:50%;background:#d6f1ff;left:39%;top:39%;box-shadow:0 0 5px #d6f1ff}
+.cell.hit{background:radial-gradient(circle,#ffcc7a 0,#d34a36 43%,#572a36 80%);border-color:#ffb16d}
+.cell.hit:after{content:"✹";position:absolute;inset:0;display:grid;place-items:center;color:#fff2c6;font-size:clamp(8px,2vw,16px);text-shadow:0 0 5px #ff4d32}
+.cell.target{cursor:crosshair}.cell.target:not(.hit):not(.miss):hover{outline:2px solid var(--gold);outline-offset:-2px;background:#21617b}.cell.preview{background:#4c9c8a;border-color:#b5ffdf}
+.board-label{display:grid;grid-template-columns:repeat(10,1fr);font-size:9px;color:#7fa5ba;text-align:center;margin:0 4px 3px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tools button{font-size:12px;padding:9px 11px}.fleet-list{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.fleet-chip{font-size:11px;padding:6px 8px;border-radius:8px;background:#092237;border:1px solid var(--line);color:var(--muted)}.fleet-chip.selected{border-color:var(--gold);color:var(--gold)}
+.notice{padding:11px 12px;border-radius:12px;background:#092237;border:1px solid var(--line);font-size:13px;line-height:1.45;margin:10px 0}.notice.gold{border-color:#846b39;color:#ffe0a0}.notice.green{border-color:#2b8068;color:#b8ffe0}
+.chat{display:flex;flex-direction:column;min-height:240px;max-height:320px}.chat-log{overflow:auto;display:flex;flex-direction:column;gap:8px;flex:1;padding:3px 2px 10px}.msg{font-size:12px;line-height:1.4;overflow-wrap:anywhere}.msg b{color:#80d9e8}.msg.system{color:var(--gold);font-style:italic}.chat-form{display:flex;gap:7px}.chat-form input{min-width:0}.chat-form button{padding:10px 13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stat{background:#092237;border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center}.stat strong{display:block;font-size:20px}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase}
+.footer{text-align:center;color:#66899d;font-size:10px;margin-top:24px}
+@media(max-width:760px){.wrap{padding:12px 10px 28px}.room-grid{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.chat{min-height:220px}.hero{margin-top:4vh}}
+@media(max-width:520px){.boards{grid-template-columns:1fr}.side{grid-template-columns:1fr}.board{gap:2px;padding:4px}.cell{border-radius:1px}.top{margin-bottom:12px}.brand h1{font-size:16px}.status{font-size:10px}.panel{padding:13px}.room-link{width:100%}.room-head{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="mark">⚓</div><div><h1>МОРСКОЙ БОЙ</h1><small>FLEET COMMAND · ONLINE</small></div></div>
+    <div class="status" id="connection">● подключение…</div>
+  </header>
+
+  <main id="lobby" class="panel hero">
+    <h2>Капитан, к бою!</h2>
+    <p class="sub">Создайте закрытую комнату и отправьте другу ссылку. Играйте один на один в настоящем морском сражении.</p>
+    <div class="field"><label for="playerName">Позывной капитана</label><input id="playerName" maxlength="18" placeholder="Например, Адмирал" autocomplete="nickname"></div>
+    <div class="actions"><button id="createBtn">⚓ Создать комнату</button><button class="secondary" id="joinToggle">Ввести код</button></div>
+    <div id="joinFields" class="hidden">
+      <div class="field"><label for="roomCode">Код комнаты</label><input id="roomCode" maxlength="10" placeholder="Например, A1B2C3" autocapitalize="characters"></div>
+      <button id="joinBtn" style="width:100%">Присоединиться к бою</button>
+    </div>
+    <p class="hint">Флот: 1 линкор, 2 крейсера, 3 эсминца и 4 катера. Корабли не должны соприкасаться даже по диагонали.</p>
+  </main>
+
+  <main id="game" class="hidden">
+    <div class="room-head panel">
+      <div><div class="mini-label">Оперативная группа</div><div class="room-code" id="roomCodeTitle">—</div><div class="muted" id="phaseText">Ожидание игрока</div></div>
+      <div class="room-link"><input id="inviteLink" readonly aria-label="Ссылка приглашения"><button id="copyBtn" class="secondary">Копировать</button></div>
+    </div>
+    <div class="room-grid">
+      <section class="game-area panel">
+        <div class="section-title"><span>⚓ Тактическая карта</span><span class="muted" id="turnLabel">—</span></div>
+        <div class="players" id="players"></div>
+        <div id="waiting" class="notice gold">Ожидаем второго капитана. Отправьте ему ссылку на комнату.</div>
+        <div id="placement" class="hidden">
+          <div class="notice">Разместите флот на своей карте. Выберите корабль, направление и нажмите на клетку. Можно воспользоваться автопостановкой.</div>
+          <div class="board-title"><span>ВАША СТОРОНА · РАССТАНОВКА</span><span class="muted" id="placedCount">0 / 10</span></div>
+          <div class="board-label">А Б В Г Д Е Ж З И К</div>
+          <div id="placeBoard" class="board"></div>
+          <div class="fleet-list" id="fleetList"></div>
+          <div class="tools"><button class="secondary" id="rotateBtn">↻ Повернуть</button><button class="secondary" id="randomBtn">✦ Авторасстановка</button><button id="readyBtn" disabled>Подтвердить флот</button></div>
+          <div class="muted" id="placeHint" style="margin-top:9px">Выберите корабль для размещения.</div>
+        </div>
+        <div id="battle" class="hidden">
+          <div class="boards">
+            <div class="board-card"><div class="board-title"><span>ВАШ ФЛОТ</span><span class="muted">оборона</span></div><div class="board-label">А Б В Г Д Е Ж З И К</div><div id="myBoard" class="board"></div></div>
+            <div class="board-card"><div class="board-title"><span>ЦЕЛЬ</span><span class="muted">атака</span></div><div class="board-label">А Б В Г Д Е Ж З И К</div><div id="enemyBoard" class="board"></div></div>
+          </div>
+          <div class="notice" id="battleNotice">Выберите клетку на карте противника, чтобы выстрелить.</div>
+        </div>
+        <div id="finished" class="hidden">
+          <div class="notice green" id="resultText">Бой завершён.</div>
+          <button id="newGameBtn">Новая игра</button>
+        </div>
+      </section>
+      <aside class="side">
+        <section class="panel">
+          <div class="section-title">📊 Статистика капитана</div>
+          <div class="stats"><div class="stat"><strong id="wins">0</strong><span>Победы</span></div><div class="stat"><strong id="losses">0</strong><span>Поражения</span></div><div class="stat"><strong id="games">0</strong><span>Матчи</span></div></div>
+          <div class="muted" style="margin-top:9px">Статистика хранится на этом устройстве.</div>
+        </section>
+        <section class="panel chat">
+          <div class="section-title">💬 Связь экипажей <span class="muted">чат</span></div>
+          <div id="chatLog" class="chat-log"></div>
+          <form id="chatForm" class="chat-form"><input id="chatInput" maxlength="300" placeholder="Сообщение…" autocomplete="off"><button>➤</button></form>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <div class="footer">FLEET COMMAND · Онлайн-морской бой · 10 × 10</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(() => {
+const socket = io();
+const $ = id => document.getElementById(id);
+const SIZE=10, FLEET=[4,3,3,2,2,2,1,1,1,1], LETTERS="АБВГДЕЖЗИК";
+let roomId=null, state=null, ships=[], selectedLen=null, direction="h", submitted=false, gameCounted=false;
+const params=new URLSearchParams(location.search);
+const savedName=localStorage.getItem("fleetName")||"";
+$("playerName").value=savedName;
+if(params.get("room")){$("roomCode").value=params.get("room").toUpperCase();$("joinFields").classList.remove("hidden");}
+const statsKey="fleetStatsV1";
+function getStats(){try{return JSON.parse(localStorage.getItem(statsKey))||{wins:0,losses:0,games:0}}catch{return {wins:0,losses:0,games:0}}}
+function paintStats(){const s=getStats();$("wins").textContent=s.wins;$("losses").textContent=s.losses;$("games").textContent=s.games}
+paintStats();
+function updateConnection(ok){$("connection").textContent=ok?"● на связи":"● нет соединения";$("connection").style.color=ok?"var(--green)":"var(--red)"}
+socket.on("connect",()=>updateConnection(true));socket.on("disconnect",()=>updateConnection(false));
+socket.on("errorMessage",msg=>alert(msg));
+socket.on("joined",data=>{roomId=data.roomId;history.replaceState({}, "", "?room="+roomId);$("lobby").classList.add("hidden");$("game").classList.remove("hidden");$("roomCodeTitle").textContent="КОД: "+roomId;$("inviteLink").value=location.href;});
+socket.on("state",s=>{state=s;renderState()});
+socket.on("fleetAccepted",()=>{$("placeHint").textContent="Флот принят. Ожидаем соперника…";$("readyBtn").disabled=true;});
+socket.on("chatMessage",m=>addChat(m));
+$("createBtn").onclick=()=>{const name=readName();socket.emit("createRoom",{name});};
+$("joinToggle").onclick=()=>{$("joinFields").classList.toggle("hidden");};
+$("joinBtn").onclick=()=>{const name=readName();socket.emit("joinRoom",{roomId:$("roomCode").value,name});};
+function readName(){const n=$("playerName").value.trim()||"Капитан";localStorage.setItem("fleetName",n);return n;}
+$("copyBtn").onclick=async()=>{try{await navigator.clipboard.writeText($("inviteLink").value);$("copyBtn").textContent="Скопировано ✓";setTimeout(()=>$("copyBtn").textContent="Копировать",1500)}catch{$("inviteLink").select();document.execCommand("copy");$("copyBtn").textContent="Скопировано ✓"}};
+$("newGameBtn").onclick=()=>{location.href=location.pathname};
+function renderState(){
+ if(!state)return;
+ const both=state.players.length===2;
+ $("players").innerHTML="";
+ state.players.forEach(p=>{const el=document.createElement("div");el.className="player-pill"+(p.name===state.turnName?" active":"");el.textContent=(p.name===state.me.name?"⚓ ":"")+" "+p.name+(p.ready?" · флот готов":" · готовится");$("players").appendChild(el)});
+ $("waiting").classList.toggle("hidden",both && !(state.phase==="placing" && state.me.ready));
+ $("waiting").textContent = !both ? "Ожидаем второго капитана. Отправьте ему ссылку на комнату." : (state.phase==="placing" && state.me.ready ? "Ваш флот готов. Ожидаем, пока соперник завершит расстановку…" : "Оба капитана на связи.");
+ $("phaseText").textContent=state.phase==="waiting"?"Ожидаем второго игрока":state.phase==="placing"?"Расстановка флотов":state.phase==="battle"?"Идёт морское сражение":"Бой завершён";
+ $("turnLabel").textContent=state.phase==="battle"?(state.isMyTurn?"ВАШ ХОД":"ХОД СОПЕРНИКА"):"";
+ $("placement").classList.toggle("hidden",state.phase!=="placing"||state.me.ready);
+ $("battle").classList.toggle("hidden",state.phase!=="battle");
+ $("finished").classList.toggle("hidden",state.phase!=="finished");
+ if(state.phase==="placing"&&!state.me.ready)renderPlacement();
+ if(state.phase==="battle")renderBattle();
+ if(state.phase==="finished"){
+   $("resultText").textContent=state.winnerName===state.me.name?"🏆 Победа! Ваш флот одержал верх.":`Поражение. Победитель: ${state.winnerName||"соперник"}.`;
+   if(!gameCounted){const s=getStats();s.games++;if(state.winnerName===state.me.name)s.wins++;else s.losses++;localStorage.setItem(statsKey,JSON.stringify(s));paintStats();gameCounted=true;}
+ }
+}
+function createGrid(el,clickable,handler){el.innerHTML="";for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){const c=document.createElement("button");c.type="button";c.className="cell";c.setAttribute("aria-label",LETTERS[x]+(y+1));c.dataset.x=x;c.dataset.y=y;if(clickable)c.onclick=()=>handler(x,y);el.appendChild(c)}}
+function placementValid(x,y,len,dir,list){
+ const occupied=new Set();
+ for(const s of list)for(let i=0;i<s.len;i++)occupied.add(`${s.x+(s.dir==="h"?i:0)},${s.y+(s.dir==="h"?0:i)}`);
+ for(let i=0;i<len;i++){const cx=x+(dir==="h"?i:0),cy=y+(dir==="h"?0:i);if(cx>=SIZE||cy>=SIZE||occupied.has(`${cx},${cy}`))return false;
+   for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=SIZE||ny>=SIZE)continue;if(occupied.has(`${nx},${ny}`))return false;}
+ }
+ return true;
+}
+function renderPlacement(){
+ createGrid($("placeBoard"),true,(x,y)=>{if(selectedLen===null)return;const idx=FLEET.indexOf(selectedLen);const already=ships.filter(s=>s.len===selectedLen).length;if(already>=FLEET.filter(n=>n===selectedLen).length)return;
+ if(!placementValid(x,y,selectedLen,direction,ships)){sound("error");$("placeHint").textContent="Так поставить нельзя: корабли не должны касаться друг друга.";return}
+ ships.push({x,y,len:selectedLen,dir:direction});sound("place");renderPlacement();});
+ const counts={};FLEET.forEach(n=>counts[n]=(counts[n]||0)+1);
+ $("fleetList").innerHTML="";
+ Object.keys(counts).sort((a,b)=>b-a).forEach(len=>{const total=counts[len],used=ships.filter(s=>s.len===Number(len)).length;const b=document.createElement("button");b.className="fleet-chip"+(selectedLen===Number(len)?" selected":"");b.textContent=`${len===4?"Линкор":len===3?"Крейсер":len===2?"Эсминец":"Катер"} ${used}/${total}`;b.disabled=used>=total;b.onclick=()=>{selectedLen=Number(len);$("placeHint").textContent=`Выбран корабль длиной ${len}. Нажмите на начальную клетку.`;renderPlacement()};$("fleetList").appendChild(b)});
+ [...$("placeBoard").children].forEach(c=>{const x=+c.dataset.x,y=+c.dataset.y;let occupied=false;for(const s of ships)for(let i=0;i<s.len;i++)if(x===s.x+(s.dir==="h"?i:0)&&y===s.y+(s.dir==="h"?0:i))occupied=true;if(occupied)c.classList.add("ship")});
+ $("placedCount").textContent=ships.length+" / 10";$("readyBtn").disabled=ships.length!==10;
+}
+$("rotateBtn").onclick=()=>{direction=direction==="h"?"v":"h";$("placeHint").textContent=direction==="h"?"Направление: горизонтально.":"Направление: вертикально.";};
+$("randomBtn").onclick=()=>{ships=[];for(const len of FLEET){let placed=false;for(let tries=0;tries<3000&&!placed;tries++){const dir=Math.random()<.5?"h":"v",x=Math.floor(Math.random()*10),y=Math.floor(Math.random()*10);if(placementValid(x,y,len,dir,ships)){ships.push({x,y,len,dir});placed=true}}if(!placed){ships=[];return alert("Не удалось расставить флот. Попробуйте ещё раз.")}}selectedLen=null;renderPlacement();$("placeHint").textContent="Флот расставлен автоматически. Нажмите «Подтвердить флот»."};
+$("readyBtn").onclick=()=>{submitted=true;socket.emit("placeFleet",{roomId,ships});$("placeHint").textContent="Передаём координаты флота…";};
+function parseShots(arr){const out={};(arr||[]).forEach(s=>out[s.key]=s.hit);return out}
+function renderBattle(){
+ const incoming=parseShots(state.me.incomingShots),made=parseShots(state.me.shotsMade);
+ createGrid($("myBoard"),false,()=>{});
+ [...$("myBoard").children].forEach(c=>{const x=+c.dataset.x,y=+c.dataset.y,k=x+","+y;if(state.me.board&&state.me.board[y][x])c.classList.add("ship");if(k in incoming)c.classList.add(incoming[k]?"hit":"miss")});
+ createGrid($("enemyBoard"),state.isMyTurn,(x,y)=>{if(!state.isMyTurn||`${x},${y}` in made)return;socket.emit("shoot",{roomId,x,y});});
+ [...$("enemyBoard").children].forEach(c=>{const k=c.dataset.x+","+c.dataset.y;if(k in made)c.classList.add(made[k]?"hit":"miss");else if(state.isMyTurn)c.classList.add("target")});
+ $("battleNotice").textContent=state.isMyTurn?"Ваш ход. Выберите клетку на карте противника.":"Соперник целится. Ожидайте…";
+ if(state.lastShot){$("battleNotice").textContent=`Последний выстрел: ${state.lastShot.by} — ${LETTERS[state.lastShot.x]}${state.lastShot.y+1}: ${state.lastShot.hit?"ПОПАДАНИЕ!":"мимо"}. `+ (state.isMyTurn?"Ваш ход.":"Ход соперника.");sound(state.lastShot.hit?"hit":"miss",true)}
+}
+const audioCtx=()=>{try{return new (window.AudioContext||window.webkitAudioContext)()}catch{return null}};
+let ctx=null,lastSound="";
+function sound(type,fromState=false){if(fromState&&lastSound===`${state?.lastShot?.by}:${state?.lastShot?.x}:${state?.lastShot?.y}`)return;if(fromState)lastSound=`${state?.lastShot?.by}:${state?.lastShot?.x}:${state?.lastShot?.y}`;try{ctx=ctx||audioCtx();if(!ctx)return;const now=ctx.currentTime;const osc=ctx.createOscillator(),gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.13,now+.02);gain.gain.exponentialRampToValueAtTime(.0001,now+(type==="hit"?.42:.18));osc.type=type==="hit"?"sawtooth":"sine";osc.frequency.setValueAtTime(type==="hit"?105:520,now);osc.frequency.exponentialRampToValueAtTime(type==="hit"?42:260,now+(type==="hit"?.42:.18));osc.start(now);osc.stop(now+(type==="hit"?.44:.2))}catch{}}
+$("chatForm").onsubmit=e=>{e.preventDefault();const t=$("chatInput").value.trim();if(!t||!roomId)return;socket.emit("chatSend",{roomId,text:t});$("chatInput").value=""};
+function addChat(m){const el=document.createElement("div");el.className="msg"+(m.system?" system":"");if(m.system)el.textContent=m.text;else{const b=document.createElement("b");b.textContent=m.name+": ";el.appendChild(b);el.appendChild(document.createTextNode(m.text))}$("chatLog").appendChild(el);$("chatLog").scrollTop=$("chatLog").scrollHeight;}
+})();
+</script>
+</body>
+</html>
